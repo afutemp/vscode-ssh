@@ -28,6 +28,8 @@ TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
 echo "正在克隆..."
+# Ensure git-lfs is available for large file download
+git lfs install 2>/dev/null || true
 if ! git clone --depth 1 --branch "$VERSION" "$REPO" "$TMPDIR/repo" 2>&1; then
     echo "错误: 克隆失败，版本 $VERSION 可能不存在"
     echo "可用版本列表: $(git ls-remote --heads "$REPO" | grep -v refs/heads/main | sed 's|.*/||' | tr '\n' ' ')"
