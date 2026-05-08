@@ -1,6 +1,6 @@
 #!/bin/bash
 # install-vscode-server.sh
-# 从 GitHub 仓库克隆并安装 VS Code Server
+# 从 GitHub 仓库克隆并安装 VS Code Server (CLI + Server)
 #
 # 用法:
 #   ./install.sh <版本号> [仓库地址]
@@ -15,8 +15,9 @@ set -euo pipefail
 VERSION="${1:?用法: $0 <版本号> [仓库地址]}"
 REPO="${2:-${VSCODE_OFFLINE_REPO:-https://github.com/afutemp/vscode-ssh.git}}"
 
-BIN_DIR="$HOME/.vscode-server/bin"
-FILENAME="vscode-server-linux-x64.tar.gz"
+BASE_DIR="$HOME/.vscode-server"
+SERVER_FILE="vscode-server-linux-x64.tar.gz"
+CLI_FILE="vscode_cli_linux_x64_cli.tar.gz"
 
 echo "=== VS Code Server 离线安装 ==="
 echo "版本: $VERSION"
@@ -40,31 +41,40 @@ if [ ! -f "$TMPDIR/repo/commit.txt" ]; then
 fi
 COMMIT=$(cat "$TMPDIR/repo/commit.txt")
 
-# Check tarball
-if [ ! -f "$TMPDIR/repo/$FILENAME" ]; then
-    echo "错误: 未找到 $FILENAME"
-    exit 1
-fi
-
-INSTALL_DIR="$BIN_DIR/$COMMIT"
+CLI_PATH="$BASE_DIR/code-$COMMIT"
+SERVER_DIR="$BASE_DIR/cli/servers/Stable-$COMMIT/server"
 
 # Skip if already installed
-if [ -f "$INSTALL_DIR/bin/code-server" ]; then
+if [ -f "$CLI_PATH" ] && [ -f "$SERVER_DIR/bin/code-server" ]; then
     echo "已安装，跳过: $COMMIT ($VERSION)"
     exit 0
 fi
 
-# Install
-mkdir -p "$INSTALL_DIR"
-echo "正在解压到 $INSTALL_DIR ..."
-tar -xzf "$TMPDIR/repo/$FILENAME" -C "$INSTALL_DIR" --strip-components 1
-
-# Verify
-if [ -f "$INSTALL_DIR/bin/code-server" ]; then
-    echo "安装成功: $VERSION ($COMMIT)"
-    echo "  路径: $INSTALL_DIR"
-else
-    echo "错误: 安装后未找到 code-server，可能安装包损坏"
-    rm -rf "$INSTALL_DIR"
+# Check files
+if [ ! -f "$TMPDIR/repo/$CLI_FILE" ]; then
+    echo "错误: 未找到 $CLI_FILE"
     exit 1
 fi
+if [ ! -f "$TMPDIR/repo/$SERVER_FILE" ]; then
+    echo "错误: 未找到 $SERVER_FILE"
+    exit 1
+fi
+
+# Install CLI
+if [ ! -f "$CLI_PATH" ]; then
+    mkdir -p "$BASE_DIR"
+    tar -xzf "$TMPDIR/repo/$CLI_FILE" -C "$TMPDIR"
+    cp "$TMPDIR/code" "$CLI_PATH"
+    chmod +x "$CLI_PATH"
+    echo "CLI 已安装: $CLI_PATH"
+fi
+
+# Install Server
+if [ ! -f "$SERVER_DIR/bin/code-server" ]; then
+    mkdir -p "$SERVER_DIR"
+    echo "正在解压 server 到 $SERVER_DIR ..."
+    tar -xzf "$TMPDIR/repo/$SERVER_FILE" -C "$SERVER_DIR" --strip-components 1
+    echo "Server 已安装: $SERVER_DIR"
+fi
+
+echo "安装成功: $VERSION ($COMMIT)"
