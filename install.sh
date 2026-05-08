@@ -49,7 +49,7 @@ fi
 INSTALL_DIR="$BIN_DIR/$COMMIT"
 
 # Skip if already installed
-if [ -f "$INSTALL_DIR/bin/remote-server" ]; then
+if [ -f "$INSTALL_DIR/bin/code-server" ]; then
     echo "已安装，跳过: $COMMIT ($VERSION)"
     exit 0
 fi
@@ -60,11 +60,11 @@ echo "正在解压到 $INSTALL_DIR ..."
 tar -xzf "$TMPDIR/repo/$FILENAME" -C "$INSTALL_DIR" --strip-components 1
 
 # Verify
-if [ -f "$INSTALL_DIR/bin/remote-server" ]; then
+if [ -f "$INSTALL_DIR/bin/code-server" ]; then
     echo "安装成功: $VERSION ($COMMIT)"
     echo "  路径: $INSTALL_DIR"
 else
-    echo "错误: 安装后未找到 remote-server，可能安装包损坏"
+    echo "错误: 安装后未找到 code-server，可能安装包损坏"
     rm -rf "$INSTALL_DIR"
     exit 1
 fi
