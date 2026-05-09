@@ -49,3 +49,17 @@ def fetch_version_commit_pairs(count: int) -> list[dict]:
         logger.info("  %s (%s)", p["version"], p["commit"][:12])
 
     return pairs
+
+
+def fetch_commit_for_version(version: str) -> str | None:
+    """Fetch the commit hash for a specific version number."""
+    # Build the mapping from the full releases/commits lists
+    releases = _fetch_json(RELEASES_URL)
+    commits = _fetch_json(COMMITS_URL)
+    mapping = dict(zip(releases, commits))
+    commit = mapping.get(version)
+    if commit:
+        logger.info("  %s -> %s", version, commit[:12])
+    else:
+        logger.warning("  %s 未在 Microsoft API 中找到", version)
+    return commit

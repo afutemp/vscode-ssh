@@ -29,8 +29,14 @@ echo "下载: $DL_BASE"
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
-# Get commit hash from release body
-COMMIT=$(curl -sL "${API_BASE}/releases/tags/${VERSION}" | grep -oP '(?<=Commit: )([0-9a-f]{40})' || true)
+# Get commit hash: try commit.txt asset first, fall back to release API
+COMMIT=$(curl -sL "${DL_BASE}/commit.txt" || true)
+if [ -z "$COMMIT" ] || echo "$COMMIT" | grep -qi "not found\|error"; then
+    COMMIT=""
+fi
+if [ -z "$COMMIT" ]; then
+    COMMIT=$(curl -sL "${API_BASE}/releases/tags/${VERSION}" | grep -oP '(?<=Commit: )([0-9a-f]{40})' || true)
+fi
 if [ -z "$COMMIT" ]; then
     echo "错误: 无法获取 commit hash（版本 $VERSION 可能不存在）"
     exit 1

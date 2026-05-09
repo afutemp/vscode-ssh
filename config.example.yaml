@@ -11,5 +11,10 @@ github_token: ""
 # 同步最近 N 个版本
 sync_count: 5
 
+# 额外同步的固定版本号（用于同步较老的版本）
+# extra_versions:
+#   - "1.116.0"
+#   - "1.100.0"
+
 # 临时目录（用于下载和 git 操作）
 # temp_dir: "/tmp/vscode-sync"

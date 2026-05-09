@@ -48,9 +48,12 @@ VSCODE_OFFLINE_REPO=https://github.com/your-fork/vscode-ssh bash install.sh 1.11
 
 ```bash
 VERSION="1.119.0"
-COMMIT="8b640eef5a6c6089c029249d48efa5c99adf7d51"
 
-# 下载
+# 下载（commit.txt 包含对应的 commit hash）
+curl -L -o commit.txt \
+    "https://github.com/afutemp/vscode-ssh/releases/download/${VERSION}/commit.txt"
+COMMIT=$(cat commit.txt)
+
 curl -L -o vscode-server-linux-x64.tar.gz \
     "https://github.com/afutemp/vscode-ssh/releases/download/${VERSION}/vscode-server-linux-x64.tar.gz"
 curl -L -o vscode_cli_linux_x64_cli.tar.gz \

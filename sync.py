@@ -9,7 +9,7 @@ from lib.config import CLI_FILENAME, FILENAME, load_config
 from lib.downloader import download_vscode_cli, download_vscode_server
 from lib.github_api import GitHubClient
 from lib.utils import setup_logging
-from lib.vscode_api import fetch_version_commit_pairs
+from lib.vscode_api import fetch_commit_for_version, fetch_version_commit_pairs
 
 logger = setup_logging()
 
@@ -59,9 +59,12 @@ def sync_version(
         return False
 
     # Upload assets
+    commit_file = temp_dir / f"commit-{commit_short}.txt"
+    commit_file.write_text(commit)
     try:
         github.upload_asset(release, str(server_path), name=FILENAME)
         github.upload_asset(release, str(cli_path), name=CLI_FILENAME)
+        github.upload_asset(release, str(commit_file), name="commit.txt")
     except Exception as e:
         logger.error("上传失败 %s: %s", version, e)
         github.delete_release(version)
@@ -70,6 +73,7 @@ def sync_version(
     # Clean up temp files
     server_path.unlink(missing_ok=True)
     cli_path.unlink(missing_ok=True)
+    commit_file.unlink(missing_ok=True)
 
     logger.info("同步完成: %s (%s)", version, commit_short)
     return True
@@ -110,6 +114,19 @@ def main():
     if not pairs:
         logger.warning("没有获取到版本信息")
         sys.exit(0)
+
+    # 1.5. Resolve extra versions from config
+    extra_versions = cfg.get("extra_versions") or []
+    if extra_versions:
+        logger.info("解析额外固定版本...")
+        existing_versions = {p["version"] for p in pairs}
+        for ver in extra_versions:
+            if ver in existing_versions:
+                logger.debug("  %s 已在近期版本中，跳过", ver)
+                continue
+            commit = fetch_commit_for_version(ver)
+            if commit:
+                pairs.append({"version": ver, "commit": commit})
 
     # 2. Initialize GitHub client
     github = GitHubClient(cfg["repo_owner"], cfg["repo_name"], cfg["github_token"])
