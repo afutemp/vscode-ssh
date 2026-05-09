@@ -1,0 +1,15 @@
+# VS Code Server 离线同步工具配置文件
+# 复制为 config.yaml 并填写实际值
+
+# GitHub 仓库（格式: owner/repo）
+github_repo: "owner/vscode-server-offline"
+
+# GitHub Personal Access Token（需要 repo 权限）
+# 也可通过 GITHUB_TOKEN 环境变量设置
+github_token: ""
+
+# 同步最近 N 个版本
+sync_count: 5
+
+# 临时目录（用于下载和 git 操作）
+# temp_dir: "/tmp/vscode-sync"
