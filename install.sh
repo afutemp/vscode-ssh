@@ -61,6 +61,10 @@ echo "正在下载 CLI..."
 curl -fSL -o "$TMPDIR/vscode_cli_linux_x64_cli.tar.gz" \
     "${DL_BASE}/vscode_cli_linux_x64_cli.tar.gz"
 
+echo "正在下载 web server..."
+curl -fSL -o "$TMPDIR/vscode-reh-web-linux-x64.tar.gz" \
+    "${DL_BASE}/vscode-reh-web-linux-x64.tar.gz"
+
 # Install CLI
 if [ ! -f "$CLI_PATH" ]; then
     mkdir -p "$BASE_DIR"
@@ -76,6 +80,15 @@ if [ ! -f "$SERVER_DIR/bin/code-server" ]; then
     echo "正在解压 server..."
     tar -xzf "$TMPDIR/vscode-server-linux-x64.tar.gz" -C "$SERVER_DIR" --strip-components 1
     echo "Server 已安装: $SERVER_DIR"
+fi
+
+# Install Web Server
+WEB_SERVER_DIR="$BASE_DIR/cli/serve-web/Stable-${COMMIT}/server"
+if [ ! -d "$WEB_SERVER_DIR" ]; then
+    mkdir -p "$WEB_SERVER_DIR"
+    echo "正在解压 web server..."
+    tar -xzf "$TMPDIR/vscode-reh-web-linux-x64.tar.gz" -C "$WEB_SERVER_DIR" --strip-components 1
+    echo "Web Server 已安装: $WEB_SERVER_DIR"
 fi
 
 echo "安装成功: $VERSION ($COMMIT)"

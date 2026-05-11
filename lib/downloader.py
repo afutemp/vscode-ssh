@@ -11,7 +11,7 @@ from rich.progress import (
     TransferSpeedColumn,
 )
 
-from lib.config import DOWNLOAD_BASE_URL, CLI_FILENAME, FILENAME
+from lib.config import DOWNLOAD_BASE_URL, CLI_FILENAME, FILENAME, WEB_FILENAME
 from lib.utils import human_size
 
 logger = logging.getLogger("vscode-sync")
@@ -96,3 +96,13 @@ def download_vscode_cli(
     """Download a VS Code CLI tarball from Microsoft CDN."""
     url = f"{base_url}/stable/{commit}/{CLI_FILENAME}"
     return _download_file(url, dest, f"下载 CLI {commit[:12]}", min_size=5 * 1024 * 1024)
+
+
+def download_vscode_server_web(
+    commit: str,
+    dest: Path,
+    base_url: str = DOWNLOAD_BASE_URL,
+) -> Path:
+    """Download a VS Code Web Server tarball from Microsoft CDN."""
+    url = f"{base_url}/stable/{commit}/{WEB_FILENAME}"
+    return _download_file(url, dest, f"下载 web server {commit[:12]}")

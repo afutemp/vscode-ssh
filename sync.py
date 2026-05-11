@@ -5,8 +5,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from lib.config import CLI_FILENAME, FILENAME, load_config
-from lib.downloader import download_vscode_cli, download_vscode_server
+from lib.config import CLI_FILENAME, FILENAME, WEB_FILENAME, load_config
+from lib.downloader import download_vscode_cli, download_vscode_server, download_vscode_server_web
 from lib.github_api import GitHubClient
 from lib.utils import setup_logging
 from lib.vscode_api import fetch_commit_for_version, fetch_version_commit_pairs
@@ -43,6 +43,14 @@ def sync_version(
         logger.error("下载 CLI 失败 %s: %s", commit_short, e)
         return False
 
+    # Download Web Server from Microsoft
+    web_path = temp_dir / f"vscode-reh-web-linux-x64-{commit_short}.tar.gz"
+    try:
+        download_vscode_server_web(commit, web_path)
+    except Exception as e:
+        logger.error("下载 web server 失败 %s: %s", commit_short, e)
+        return False
+
     # Delete existing release if force-syncing
     if force:
         github.delete_release(version)
@@ -64,6 +72,7 @@ def sync_version(
     try:
         github.upload_asset(release, str(server_path), name=FILENAME)
         github.upload_asset(release, str(cli_path), name=CLI_FILENAME)
+        github.upload_asset(release, str(web_path), name=WEB_FILENAME)
         github.upload_asset(release, str(commit_file), name="commit.txt")
     except Exception as e:
         logger.error("上传失败 %s: %s", version, e)
@@ -73,6 +82,7 @@ def sync_version(
     # Clean up temp files
     server_path.unlink(missing_ok=True)
     cli_path.unlink(missing_ok=True)
+    web_path.unlink(missing_ok=True)
     commit_file.unlink(missing_ok=True)
 
     logger.info("同步完成: %s (%s)", version, commit_short)
