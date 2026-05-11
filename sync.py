@@ -44,7 +44,7 @@ def sync_version(
         return False
 
     # Download Web Server from Microsoft
-    web_path = temp_dir / f"vscode-reh-web-linux-x64-{commit_short}.tar.gz"
+    web_path = temp_dir / f"vscode-server-linux-x64-web-{commit_short}.tar.gz"
     try:
         download_vscode_server_web(commit, web_path)
     except Exception as e:

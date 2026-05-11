@@ -11,7 +11,7 @@ DEFAULTS = {
 PLATFORM = "linux-x64"
 FILENAME = f"vscode-server-{PLATFORM}.tar.gz"
 CLI_FILENAME = f"vscode_cli_{PLATFORM.replace('-', '_')}_cli.tar.gz"
-WEB_FILENAME = f"vscode-reh-web-{PLATFORM}.tar.gz"
+WEB_FILENAME = f"vscode-server-{PLATFORM}-web.tar.gz"
 DOWNLOAD_BASE_URL = (
     "https://vscode.download.prss.microsoft.com/dbazure/download"
 )
