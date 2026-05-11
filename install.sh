@@ -82,8 +82,9 @@ if [ ! -f "$SERVER_DIR/bin/code-server" ]; then
     echo "Server 已安装: $SERVER_DIR"
 fi
 
-# Install Web Server
-WEB_SERVER_DIR="$BASE_DIR/cli/serve-web/Stable-${COMMIT}/server"
+# Install Web Server (for serve-web)
+VSCODE_DIR="$HOME/.vscode"
+WEB_SERVER_DIR="$VSCODE_DIR/cli/serve-web/$COMMIT"
 if [ ! -d "$WEB_SERVER_DIR" ]; then
     mkdir -p "$WEB_SERVER_DIR"
     echo "正在解压 web server..."
